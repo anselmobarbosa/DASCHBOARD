@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard de Ocorrências — Golden Shopping</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0f14;
+    --surface: #151820;
+    --surface2: #1c2030;
+    --border: rgba(255,255,255,0.07);
+    --text: #f0f2f8;
+    --muted: #7a7f94;
+    --accent: #4f8ef7;
+    --accent2: #f7884f;
+    --red: #e25454;
+    --amber: #f0a030;
+    --green: #3db87a;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* TOP HEADER */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .topbar-left h1 {
+    font-family: var(--font-head);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--text);
+  }
+
+  .topbar-left span {
+    font-size: 12px;
+    color: var(--muted);
+    display: block;
+    margin-top: 2px;
+  }
+
+  .year-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+  }
+
+  .year-tab {
+    padding: 7px 18px;
+    border-radius: 7px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-head);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .year-tab.active {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .year-tab:hover:not(.active) {
+    color: var(--text);
+    background: var(--surface2);
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    padding: 28px 40px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* METRICS */
+  .metrics-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .metric-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .metric-card:hover { border-color: rgba(255,255,255,0.15); }
+
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    border-radius: 14px 14px 0 0;
+  }
+
+  .metric-card.blue::before { background: var(--accent); }
+  .metric-card.amber::before { background: var(--amber); }
+  .metric-card.green::before { background: var(--green); }
+  .metric-card.red::before { background: var(--red); }
+
+  .metric-label {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .metric-value {
+    font-family: var(--font-head);
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+    transition: all 0.3s;
+  }
+
+  .metric-card.blue .metric-value { color: var(--accent); }
+  .metric-card.amber .metric-value { color: var(--amber); }
+  .metric-card.green .metric-value { color: var(--green); }
+  .metric-card.red .metric-value { color: var(--red); }
+
+  .metric-sub { font-size: 11px; color: var(--muted); }
+
+  /* CHARTS GRID */
+  .charts-top {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .charts-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px;
+  }
+
+  .chart-card.full { grid-column: 1 / -1; }
+
+  .chart-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+
+  .chart-title {
+    font-family: var(--font-head);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.01em;
+  }
+
+  .chart-subtitle {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  .legend-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .chart-wrap { position: relative; }
+
+  /* BADGE */
+  .badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .badge-red { background: rgba(226,84,84,0.15); color: var(--red); }
+  .badge-amber { background: rgba(240,160,48,0.15); color: var(--amber); }
+  .badge-green { background: rgba(61,184,122,0.15); color: var(--green); }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 28px;
+    color: var(--muted);
+    font-size: 11px;
+    border-top: 1px solid var(--border);
+    margin-top: 12px;
+  }
+
+  /* ANIMATE */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .metric-card, .chart-card {
+    animation: fadeUp 0.4s ease both;
+  }
+  .metric-card:nth-child(1) { animation-delay: 0.05s; }
+  .metric-card:nth-child(2) { animation-delay: 0.10s; }
+  .metric-card:nth-child(3) { animation-delay: 0.15s; }
+  .metric-card:nth-child(4) { animation-delay: 0.20s; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <h1>Ocorrências de Segurança — Golden Shopping</h1>
+    <span>Registros de furtos e tentativas · 2024 – 2026</span>
+  </div>
+  <div class="year-tabs">
+    <button class="year-tab active" onclick="setAno('all')">Todos</button>
+    <button class="year-tab" onclick="setAno('2024')">2024</button>
+    <button class="year-tab" onclick="setAno('2025')">2025</button>
+    <button class="year-tab" onclick="setAno('2026')">2026</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="metrics-row">
+    <div class="metric-card blue">
+      <div class="metric-label">Total de ocorrências</div>
+      <div class="metric-value" id="m-total">51</div>
+      <div class="metric-sub">2024 – 2026 (parcial)</div>
+    </div>
+    <div class="metric-card amber">
+      <div class="metric-label">Furtos consumados</div>
+      <div class="metric-value" id="m-consumados">33</div>
+      <div class="metric-sub">Simples + qualificado</div>
+    </div>
+    <div class="metric-card green">
+      <div class="metric-label">Tentativas / recuperados</div>
+      <div class="metric-value" id="m-tentativas">18</div>
+      <div class="metric-sub">Prevenidos pela equipe</div>
+    </div>
+    <div class="metric-card red">
+      <div class="metric-label">Nível crítico</div>
+      <div class="metric-value" id="m-criticos">5</div>
+      <div class="metric-sub">Furto qualificado (vermelho)</div>
+    </div>
+  </div>
+
+  <div class="charts-top">
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <div class="chart-title">Ocorrências por ano</div>
+          <div class="chart-subtitle">Volume total registrado em cada período</div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:230px">
+        <canvas id="chartAnos" role="img" aria-label="Ocorrências por ano"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <div class="chart-title">Tipo de ocorrência</div>
+          <div class="chart-subtitle" id="tipoSubtitle">Todos os anos</div>
+        </div>
+      </div>
+      <div id="legendTipo" class="legend-row"></div>
+      <div class="chart-wrap" style="height:175px">
+        <canvas id="chartTipo" role="img" aria-label="Distribuição por tipo"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="charts-bottom">
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <div class="chart-title">Gravidade por ano</div>
+          <div class="chart-subtitle">Classificação pelo nível de risco</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span class="badge badge-red">Vermelho</span>
+          <span class="badge badge-amber">Amarelo</span>
+          <span class="badge badge-green">Verde</span>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="chartGravidade" role="img" aria-label="Gravidade por ano"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <div class="chart-title">Distribuição mensal — 2025</div>
+          <div class="chart-subtitle">Único ano com dados completos</div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="chartMensal" role="img" aria-label="Ocorrências mensais 2025"></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Golden Shopping · Departamento de Segurança · Dados: 2024 – 2026 (até março)
+</div>
+
+<script>
+const dados = {
+  '2024': { total:10, simples:5, qualificado:2, tentativa:2, recuperado:1, verde:3, amarelo:5, vermelho:2, meses:[0,0,2,0,1,1,1,1,1,0,0,3] },
+  '2025': { total:31, simples:14, qualificado:2, tentativa:9, recuperado:6, verde:15, amarelo:14, vermelho:2, meses:[0,3,6,3,5,4,2,2,3,0,1,2] },
+  '2026': { total:10, simples:9, qualificado:1, tentativa:0, recuperado:0, verde:0, amarelo:9, vermelho:1, meses:[6,1,3,0,0,0,0,0,0,0,0,0] }
+};
+
+const all = {
+  total: 51,
+  simples: 28, qualificado: 5, tentativa: 11, recuperado: 7,
+  verde: 18, amarelo: 28, vermelho: 5,
+  meses: [6,4,11,3,6,5,3,3,4,0,1,5]
+};
+
+const CORES = {
+  accent: '#4f8ef7',
+  accent2: '#f7884f',
+  red: '#e25454',
+  amber: '#f0a030',
+  green: '#3db87a',
+  blue2: '#82b5fa',
+  muted: '#7a7f94'
+};
+
+const gridColor = 'rgba(255,255,255,0.05)';
+const tickColor = '#7a7f94';
+
+Chart.defaults.color = tickColor;
+Chart.defaults.borderColor = gridColor;
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+
+let charts = {};
+
+function destroyAll() {
+  Object.values(charts).forEach(c => c && c.destroy());
+  charts = {};
+}
+
+function buildAll(ano) {
+  destroyAll();
+  const d = ano === 'all' ? all : dados[ano];
+
+  // Métricas
+  document.getElementById('m-total').textContent = d.total;
+  document.getElementById('m-consumados').textContent = d.simples + d.qualificado;
+  document.getElementById('m-tentativas').textContent = d.tentativa + d.recuperado;
+  document.getElementById('m-criticos').textContent = d.vermelho;
+  document.getElementById('tipoSubtitle').textContent = ano === 'all' ? 'Todos os anos' : 'Ano ' + ano;
+
+  // CHART 1 — Barras por ano
+  {
+    const ctx = document.getElementById('chartAnos').getContext('2d');
+    const anos = ['2024','2025','2026\n(parcial)'];
+    const vals = [10, 31, 10];
+    const bgs = vals.map((_, i) => ano === 'all' ? CORES.accent : (
+      (ano === '2024' && i === 0) || (ano === '2025' && i === 1) || (ano === '2026' && i === 2)
+        ? CORES.accent : 'rgba(79,142,247,0.25)'
+    ));
+    charts.anos = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['2024', '2025', '2026 (parcial)'],
+        datasets: [{ data: vals, backgroundColor: bgs, borderRadius: 6, borderSkipped: false }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.parsed.y + ' ocorrências' } } },
+        scales: {
+          y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: tickColor, stepSize: 5 } },
+          x: { grid: { display: false }, ticks: { color: tickColor, autoSkip: false } }
+        }
+      }
+    });
+  }
+
+  // CHART 2 — Donut tipos
+  {
+    const ctx = document.getElementById('chartTipo').getContext('2d');
+    const labels = ['Furto simples', 'Tentativa', 'Tentado/recuperado', 'Qualificado'];
+    const vals2 = [d.simples, d.tentativa, d.recuperado, d.qualificado];
+    const colors = [CORES.accent, CORES.green, CORES.amber, CORES.red];
+    const total2 = vals2.reduce((a,b) => a+b, 0);
+
+    document.getElementById('legendTipo').innerHTML = labels.map((l, i) =>
+      `<div class="legend-item"><span class="legend-dot" style="background:${colors[i]}"></span>${l} <strong style="color:${colors[i]};margin-left:2px">${total2 ? Math.round(vals2[i]/total2*100) : 0}%</strong></div>`
+    ).join('');
+
+    charts.tipo = new Chart(ctx, {
+      type: 'doughnut',
+      data: { labels, datasets: [{ data: vals2, backgroundColor: colors, borderWidth: 0, hoverOffset: 6 }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.parsed } } },
+        cutout: '62%'
+      }
+    });
+  }
+
+  // CHART 3 — Gravidade empilhada
+  {
+    const ctx = document.getElementById('chartGravidade').getContext('2d');
+    charts.gravidade = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['2024', '2025', '2026 (parcial)'],
+        datasets: [
+          { label: 'Vermelho', data: [2,2,1], backgroundColor: CORES.red, borderRadius: 3 },
+          { label: 'Amarelo', data: [5,14,9], backgroundColor: CORES.amber, borderRadius: 3 },
+          { label: 'Verde', data: [3,15,0], backgroundColor: CORES.green, borderRadius: 3 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { stacked: true, grid: { display: false }, ticks: { color: tickColor } },
+          y: { stacked: true, beginAtZero: true, grid: { color: gridColor }, ticks: { color: tickColor } }
+        }
+      }
+    });
+  }
+
+  // CHART 4 — Mensal 2025
+  {
+    const ctx = document.getElementById('chartMensal').getContext('2d');
+    const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    const vals3 = dados['2025'].meses;
+    charts.mensal = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: meses,
+        datasets: [{
+          label: '2025',
+          data: vals3,
+          borderColor: CORES.accent2,
+          backgroundColor: 'rgba(247,136,79,0.12)',
+          borderWidth: 2,
+          tension: 0.4,
+          fill: true,
+          pointRadius: 4,
+          pointBackgroundColor: CORES.accent2,
+          pointBorderColor: '#0d0f14',
+          pointBorderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: tickColor, stepSize: 2 } },
+          x: { grid: { display: false }, ticks: { color: tickColor, autoSkip: false, maxRotation: 0 } }
+        }
+      }
+    });
+  }
+}
+
+function setAno(ano) {
+  document.querySelectorAll('.year-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  buildAll(ano);
+}
+
+buildAll('all');
+</script>
+</body>
+</html>
