@@ -290,7 +290,7 @@
     <div class="metric-card amber">
       <div class="metric-label">Furtos consumados</div>
       <div class="metric-value" id="m-consumados">33</div>
-      <div class="metric-sub">Simples + qualificado</div>
+      <div class="metric-sub">Furto simples confirmado</div>
     </div>
     <div class="metric-card green">
       <div class="metric-label">Tentativas / recuperados</div>
@@ -298,9 +298,9 @@
       <div class="metric-sub">Prevenidos pela equipe</div>
     </div>
     <div class="metric-card red">
-      <div class="metric-label">Nível crítico</div>
+      <div class="metric-label">Nível vermelho</div>
       <div class="metric-value" id="m-criticos">5</div>
-      <div class="metric-sub">Furto qualificado (vermelho)</div>
+      <div class="metric-sub">Alta gravidade — ação imediata</div>
     </div>
   </div>
 
@@ -343,7 +343,7 @@
           <span class="badge badge-green">Verde</span>
         </div>
       </div>
-      <div class="chart-wrap" style="height:200px">
+      <div class="chart-wrap" style="height:180px">
         <canvas id="chartGravidade" role="img" aria-label="Gravidade por ano"></canvas>
       </div>
     </div>
@@ -354,9 +354,52 @@
           <div class="chart-subtitle">Único ano com dados completos</div>
         </div>
       </div>
-      <div class="chart-wrap" style="height:200px">
+      <div class="chart-wrap" style="height:180px">
         <canvas id="chartMensal" role="img" aria-label="Ocorrências mensais 2025"></canvas>
       </div>
+    </div>
+  </div>
+
+  <!-- TABELA ALTO RISCO -->
+  <div style="margin-top:14px">
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <div class="chart-title">🔴 Ocorrências de alto risco — detalhamento</div>
+          <div class="chart-subtitle">Furtos planejados, em grupo ou com uso de força · nível vermelho</div>
+        </div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+            <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:500;white-space:nowrap">Data</th>
+            <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:500;white-space:nowrap">Ano</th>
+            <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:500;white-space:nowrap">Local / Alvo</th>
+            <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:500">O que ocorreu</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+            <td style="padding:10px 12px;color:var(--red);font-weight:600;white-space:nowrap">07/09/2024</td>
+            <td style="padding:10px 12px;color:var(--muted)">2024</td>
+            <td style="padding:10px 12px;color:var(--text);white-space:nowrap">Loja Pikurruchas — L2</td>
+            <td style="padding:10px 12px;color:var(--muted)">Arrombamento noturno após fechamento. Meliante ficou 5h dentro da loja. Subtraiu notebook Dell, 6 celulares Motorola, espumante, balas e R$ 619,90 em dinheiro. Perícia e PM acionados.</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+            <td style="padding:10px 12px;color:var(--red);font-weight:600;white-space:nowrap">09/12/2024</td>
+            <td style="padding:10px 12px;color:var(--muted)">2024</td>
+            <td style="padding:10px 12px;color:var(--text);white-space:nowrap">Estacionamento G4</td>
+            <td style="padding:10px 12px;color:var(--muted)">Furto de estepe de Amarok em vaga de idoso. Dois meliantes usaram veículo HB20 como apoio. Ação coordenada com veículo de fuga.</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 12px;color:var(--red);font-weight:600;white-space:nowrap">07/03/2025</td>
+            <td style="padding:10px 12px;color:var(--muted)">2025</td>
+            <td style="padding:10px 12px;color:var(--text);white-space:nowrap">Estacionamento G1</td>
+            <td style="padding:10px 12px;color:var(--muted)">Tentativa de furto de veículo T-Cross (locadora Unidas) com uso de simulacro de arma. Detido por policial civil presente no local. 3 viaturas acionadas, BO lavrado.</td>
+          </tr>
+
+        </tbody>
+      </table>
     </div>
   </div>
 
@@ -369,15 +412,15 @@
 <script>
 const dados = {
   '2024': { total:10, simples:5, qualificado:2, tentativa:2, recuperado:1, verde:3, amarelo:5, vermelho:2, meses:[0,0,2,0,1,1,1,1,1,0,0,3] },
-  '2025': { total:31, simples:14, qualificado:2, tentativa:9, recuperado:6, verde:15, amarelo:14, vermelho:2, meses:[0,3,6,3,5,4,2,2,3,0,1,2] },
-  '2026': { total:10, simples:9, qualificado:1, tentativa:0, recuperado:0, verde:0, amarelo:9, vermelho:1, meses:[6,1,3,0,0,0,0,0,0,0,0,0] }
+  '2025': { total:31, simples:14, qualificado:1, tentativa:9, recuperado:6, verde:15, amarelo:15, vermelho:1, meses:[0,3,6,3,5,4,2,2,3,0,1,2] },
+  '2026': { total:9, simples:9, qualificado:0, tentativa:0, recuperado:0, verde:0, amarelo:9, vermelho:0, meses:[5,1,3,0,0,0,0,0,0,0,0,0] }
 };
 
 const all = {
-  total: 51,
-  simples: 28, qualificado: 5, tentativa: 11, recuperado: 7,
-  verde: 18, amarelo: 28, vermelho: 5,
-  meses: [6,4,11,3,6,5,3,3,4,0,1,5]
+  total: 50,
+  simples: 28, qualificado: 3, tentativa: 11, recuperado: 7,
+  verde: 18, amarelo: 29, vermelho: 3,
+  meses: [5,4,11,3,6,5,3,3,4,0,1,5]
 };
 
 const CORES = {
@@ -410,7 +453,7 @@ function buildAll(ano) {
 
   // Métricas
   document.getElementById('m-total').textContent = d.total;
-  document.getElementById('m-consumados').textContent = d.simples + d.qualificado;
+  document.getElementById('m-consumados').textContent = d.simples;
   document.getElementById('m-tentativas').textContent = d.tentativa + d.recuperado;
   document.getElementById('m-criticos').textContent = d.vermelho;
   document.getElementById('tipoSubtitle').textContent = ano === 'all' ? 'Todos os anos' : 'Ano ' + ano;
@@ -444,9 +487,9 @@ function buildAll(ano) {
   // CHART 2 — Donut tipos
   {
     const ctx = document.getElementById('chartTipo').getContext('2d');
-    const labels = ['Furto simples', 'Tentativa', 'Tentado/recuperado', 'Qualificado'];
-    const vals2 = [d.simples, d.tentativa, d.recuperado, d.qualificado];
-    const colors = [CORES.accent, CORES.green, CORES.amber, CORES.red];
+    const labels = ['Furto simples', 'Tentativa', 'Tentado/recuperado'];
+    const vals2 = [d.simples, d.tentativa, d.recuperado];
+    const colors = [CORES.accent, CORES.green, CORES.amber];
     const total2 = vals2.reduce((a,b) => a+b, 0);
 
     document.getElementById('legendTipo').innerHTML = labels.map((l, i) =>
@@ -472,8 +515,8 @@ function buildAll(ano) {
       data: {
         labels: ['2024', '2025', '2026 (parcial)'],
         datasets: [
-          { label: 'Vermelho', data: [2,2,1], backgroundColor: CORES.red, borderRadius: 3 },
-          { label: 'Amarelo', data: [5,14,9], backgroundColor: CORES.amber, borderRadius: 3 },
+          { label: 'Vermelho', data: [2,1,0], backgroundColor: CORES.red, borderRadius: 3 },
+          { label: 'Amarelo', data: [5,15,9], backgroundColor: CORES.amber, borderRadius: 3 },
           { label: 'Verde', data: [3,15,0], backgroundColor: CORES.green, borderRadius: 3 }
         ]
       },
